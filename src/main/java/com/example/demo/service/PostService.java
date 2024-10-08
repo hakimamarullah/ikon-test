@@ -22,15 +22,14 @@ import java.util.Optional;
 
 @Service
 public class PostService {
+    private static List<PostResponse> posts = new ArrayList<>();
     private final RestTemplate client = new RestTemplate();
     private final ObjectMapper mapper;
-
-    private static List<PostResponse> posts = new ArrayList<>();
 
     public PostService(ObjectMapper mapper) {
         this.mapper = mapper;
     }
-    @SuppressWarnings("unchecked")
+
     public List<PostResponse> getPosts(Map<String, String> pageable) {
         pageable = Optional.ofNullable(pageable).orElse(new HashMap<>());
         int page = Integer.parseInt(pageable.getOrDefault("page", "1"));
@@ -43,10 +42,11 @@ public class PostService {
     }
 
     @PostConstruct
+    @SuppressWarnings("unchecked")
     public void fetchPost() {
         List<Object> response = client.getForObject("https://jsonplaceholder.typicode.com/posts", List.class);
-        posts.addAll(mapper.convertValue(response, new TypeReference<List<PostResponse>>() {}));
-        System.out.println(posts.size());
+        posts.addAll(mapper.convertValue(response, new TypeReference<List<PostResponse>>() {
+        }));
     }
 
 }
